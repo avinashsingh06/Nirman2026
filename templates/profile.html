@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Profile</title>
+<style>
+body{
+background:#0f172a;
+color:white;
+font-family:Segoe UI;
+text-align:center;
+}
+.card{
+background:rgba(255,255,255,0.05);
+margin:20px;
+padding:20px;
+border-radius:20px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>👤 Profile</h2>
+
+<div class="card">
+<h3>Bawaal User</h3>
+<p>Points: <span id="points">0</span></p>
+<p>🔥 Streak: <span id="streak">0</span></p>
+</div>
+
+<div class="card">
+<h3>🏆 Achievements</h3>
+<p>✔ Consistency on peak</p>
+<p>✔ keep going</p>
+<p>✔ Mood Master</p>
+</div>
+
+<div class="card">
+<h3>📊 Mood Progress</h3>
+<p>Improving steadily 🚀</p>
+</div>
+
+<script>
+setInterval(async ()=>{
+let res=await fetch('/get_data');
+let data=await res.json();
+
+document.getElementById("points").innerText=data.points;
+document.getElementById("streak").innerText=data.streak;
+},2000);
+</script>
+
+</body>
+</html>

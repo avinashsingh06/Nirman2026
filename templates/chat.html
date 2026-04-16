@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Chat</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+
+        .messages {
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .msg {
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user {
+            background: #4caf50;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .bot {
+            background: #f1f1f1;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .input-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background: #ff4d6d;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #e63958;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <h2>🤖 Persona AI Chat</h2>
+
+    <div class="messages" id="messages">
+        <div class="msg bot">Hello! How can I help you today? ✨</div>
+    </div>
+
+    <div class="input-box">
+        <input type="text" id="userInput" placeholder="Type a message..." onkeypress="handleKey(event)">
+        <button onclick="sendMsg()">Send</button>
+    </div>
+</div>
+
+<script>
+    // Enter key se message bhejne ke liye
+    function handleKey(event) {
+        if (event.key === "Enter") {
+            sendMsg();
+        }
+    }
+
+    async function sendMsg() {
+        const input = document.getElementById("userInput");
+        const msgDiv = document.getElementById("messages");
+        const text = input.value.trim();
+
+        if (text === "") return;
+
+        // User ka message screen par dikhao
+        msgDiv.innerHTML += `<div class="msg user">${text}</div>`;
+        input.value = "";
+        msgDiv.scrollTop = msgDiv.scrollHeight;
+
+        try {
+            // Flask backend ko message bhejo
+            const response = await fetch('/ai_chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await response.json();
+            
+            // Bot ka reply screen par dikhao
+            msgDiv.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+            msgDiv.scrollTop = msgDiv.scrollHeight;
+
+        } catch (error) {
+            console.error("Error:", error);
+            msgDiv.innerHTML += `<div class="msg bot">Something went wrong 😓</div>`;
+        }
+    }
+</script>
+
+</body>
+</html>

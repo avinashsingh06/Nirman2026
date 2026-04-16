@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Music</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI';
+    background: linear-gradient(135deg,#0f172a,#1e293b);
+    color: white;
+}
+
+/* LAYOUT */
+.container {
+    display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 220px;
+    background: rgba(255,255,255,0.05);
+    height: 100vh;
+    padding: 20px;
+}
+
+.sidebar h2 {
+    margin-bottom: 20px;
+}
+
+.sidebar a {
+    display: block;
+    margin-top: 15px;
+    color: white;
+    text-decoration: none;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+/* CARDS */
+.card {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 20px;
+}
+
+/* CAMERA */
+.camera img {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* BUTTON */
+button {
+    padding: 10px;
+    width: 100%;
+    background: #ff4d6d;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    margin-top: 10px;
+}
+
+/* UPLOAD */
+.upload-btn {
+    background: #6366f1;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* SONG LIST */
+.song {
+    cursor: pointer;
+    color: #ff4d6d;
+    margin-top: 5px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.action-panel {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.back-btn {
+    margin-top: 10px;
+    background: #3b82f6;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+<h2>PERSONA</h2>
+
+<a href="/">📷 Dashboard</a> <a href="/chat">💬 Chat</a> <a href="/music">🎵 Music</a> <a href="/analytics">📊 Stats</a>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+<h2>🎵 Music Dashboard</h2>
+
+<div class="grid">
+
+<!-- LEFT -->
+
+<div class="card">
+
+<h3>📷 Smart Camera</h3>
+
+<div id="actionPanel" class="action-panel">
+    <button id="openCameraBtn" onclick="openCamera()">Open Camera</button>
+    <label class="upload-btn" id="uploadLabel" onclick="startUpload()">
+        Upload Photo
+        <input type="file" id="photoInput" hidden>
+    </label>
+</div>
+
+<div id="cameraSection" class="hidden">
+    <div class="camera">
+        <img src="/video">
+    </div>
+
+    <h3 id="emotion">Detecting...</h3>
+
+    <button onclick="lockEmotion()">Lock Emotion 🔒</button>
+    <button class="back-btn" id="cameraBackBtn" onclick="resetMusicPage()">Back</button>
+</div>
+
+<div id="photoSection" class="hidden">
+    <img id="preview" style="display:none; max-width:200px; margin-top:15px;">
+    <button class="back-btn hidden" id="photoBackBtn" onclick="resetMusicPage()">Back</button>
+</div>
+
+<!-- RIGHT -->
+
+<div class="card">
+
+<h3>🎧 Music Suggestions</h3>
+
+<div id="spotifyPlayer"></div>
+
+<h4>YouTube Songs</h4>
+<div id="songList"></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+const spotify = {
+happy: [
+"https://open.spotify.com/embed/track/0VjIjW4GlUZAMYd2vXMi3b"
+],
+
+neutral: [
+"https://open.spotify.com/embed/track/6ocbgoVGwYJhOv1GgI9NsF"
+],
+
+sad: [
+"https://open.spotify.com/embed/track/7MXVkk9YMctZqd1Srtv4MB"
+],
+
+angry: [
+"https://open.spotify.com/embed/track/0pqnGHJpmpxLKifKRmU6WP"
+],
+
+surprise: [
+"https://open.spotify.com/embed/track/1AhDOtG9vPSOmsWgNW0BEY"
+]
+};
+const youtube={ happy:[{name:"Shape of You",link:"https://youtu.be/JGwWNGJdvx8"}], sad:[{name:"Let Her Go",link:"https://youtu.be/RBumgq5yVrA"}], angry:[{name:"Believer",link:"https://youtu.be/7wtfhZwyrcc"}], neutral:[{name:"Lofi Chill",link:"https://youtu.be/5qap5aO4i9A"}] };
+
+let lockedEmotion = null;
+let currentSuggestedEmotion = null;
+
+function openCamera() {
+    document.getElementById("actionPanel").classList.add("hidden");
+    document.getElementById("cameraSection").classList.remove("hidden");
+    document.getElementById("photoSection").classList.add("hidden");
+}
+
+function startUpload() {
+    document.getElementById("openCameraBtn").classList.add("hidden");
+    document.getElementById("cameraSection").classList.add("hidden");
+}
+
+function resetMusicPage() {
+    window.location.reload();
+}
+
+// LIVE EMOTION
+setInterval(async ()=>{
+    let res = await fetch('/get_data');
+    let data = await res.json();
+
+    let emo = data.emotions[data.emotions.length-1] || "neutral";
+
+    if (!lockedEmotion && !document.getElementById("cameraSection").classList.contains("hidden")) {
+        document.getElementById("emotion").innerText = "Emotion: " + emo;
+        
+        if (emo !== currentSuggestedEmotion) {
+            suggestMusic(emo);
+            currentSuggestedEmotion = emo;
+        }
+    }
+},1000);
+
+// LOCK
+function lockEmotion(){
+    lockedEmotion = document.getElementById("emotion").innerText.split(": ")[1];
+    suggestMusic(lockedEmotion);
+}
+
+// Auto-suggest music function
+function suggestMusic(emotion) {
+    let sp = spotify[emotion];
+    if (sp) {
+        document.getElementById("spotifyPlayer").innerHTML =
+            `<iframe src="${sp[0]}" width="100%" height="120" frameborder="0" allowtransparency="true" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+    }
+
+    let songs = youtube[emotion] || youtube["neutral"];
+
+    let html = "";
+    songs.forEach(s => {
+        html += `<p class="song" onclick="window.open('${s.link}')">▶ ${s.name}</p>`;
+    });
+
+    document.getElementById("songList").innerHTML = html;
+}
+
+const photoInput = document.getElementById("photoInput");
+photoInput.addEventListener("change", function(e) {
+    let file = e.target.files[0];
+    let preview = document.getElementById("preview");
+    let photoSection = document.getElementById("photoSection");
+    let photoBackBtn = document.getElementById("photoBackBtn");
+
+    if (file) {
+        document.getElementById("actionPanel").classList.add("hidden");
+        document.getElementById("cameraSection").classList.add("hidden");
+        photoSection.classList.remove("hidden");
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+        photoBackBtn.classList.remove("hidden");
+    }
+});
+
+</script>
+
+</body>
+</html>
+

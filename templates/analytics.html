@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Analytics</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+margin:0;
+font-family:Segoe UI;
+background:#0f172a;
+color:white;
+}
+
+.container{
+padding:30px;
+}
+
+h1{
+text-align:center;
+margin-bottom:30px;
+}
+
+/* GRID */
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+/* CARD */
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* CHART */
+canvas{
+width:35%!important;
+height:150px!important;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📊 Analytics</h1>
+
+<div class="grid">
+
+<!-- PIE -->
+
+<div class="card">
+<h3>Emotion Distribution</h3>
+<canvas id="pieChart"></canvas>
+</div>
+
+<!-- BAR -->
+
+<div class="card">
+<h3>Total Count</h3>
+<canvas id="barChart"></canvas>
+</div>
+
+<!-- DAILY -->
+
+<div class="card">
+<h3>Daily Trend</h3>
+<canvas id="dailyChart"></canvas>
+</div>
+
+<!-- WEEKLY -->
+
+<div class="card">
+<h3>Weekly Trend</h3>
+<canvas id="weeklyChart"></canvas>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+async function loadCharts(){
+
+const res = await fetch('/analytics_data');
+const data = await res.json();
+
+const labels = data.labels;
+const values = data.values;
+
+/* PIE */
+new Chart(document.getElementById("pieChart"),{
+type:'pie',
+data:{
+labels:labels,
+datasets:[{data:values}]
+}
+});
+
+/* BAR */
+new Chart(document.getElementById("barChart"),{
+type:'bar',
+data:{
+labels:labels,
+datasets:[{data:values}]
+}
+});
+
+/* DAILY (fake trend for now) */
+new Chart(document.getElementById("dailyChart"),{
+type:'line',
+data:{
+labels:["Mon","Tue","Wed","Thu","Fri"],
+datasets:[{
+label:"Mood",
+data:values.slice(0,5)
+}]
+}
+});
+
+/* WEEKLY */
+new Chart(document.getElementById("weeklyChart"),{
+type:'line',
+data:{
+labels:["W1","W2","W3","W4"],
+datasets:[{
+label:"Mood",
+data:values.slice(0,4)
+}]
+}
+});
+
+}
+
+loadCharts();
+
+</script>
+
+</body>
+</html>
+
+
+

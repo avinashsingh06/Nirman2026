@@ -1,151 +1,206 @@
 <!DOCTYPE html>
-
 <html>
 <head>
-<title>Analytics</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: white;
+        }
 
-<style>
-body{
-margin:0;
-font-family:Segoe UI;
-background:#0f172a;
-color:white;
-}
+        .container {
+            padding: 30px;
+        }
 
-.container{
-padding:30px;
-}
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            color: #38bdf8;
+        }
 
-h1{
-text-align:center;
-margin-bottom:30px;
-}
+        /* GRID */
+    .grid {
+        display: grid;
+        /* Isse har line mein sirf 2 boxes aayenge */
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 25px; /* Boxes ke beech ka gap */
+        width: 100%;
+        
+    }
 
-/* GRID */
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px;
-}
+        /* CARD */
+        .card {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            border: 1px solid #334155;
+            transition: transform 0.3s ease;
+        }
 
-/* CARD */
-.card{
-background:#1e293b;
-padding:20px;
-border-radius:20px;
-box-shadow:0 10px 25px rgba(0,0,0,0.3);
-}
+        .card:hover {
+            transform: translateY(-5px);
+        }
 
-/* CHART */
-canvas{
-width:35%!important;
-height:150px!important;
-}
-</style>
+        h3 {
+            margin-top: 0;
+            color: #94a3b8;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
 
+        /* CHART FIX: Width ko 100% rakho taaki container mein fit ho */
+        .chart-container {
+            position: relative;
+            height: 180px; /* Chart ki height yahan se control karo */
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="container">
+    <h1>📊 Analytics Dashboard</h1>
 
-<h1>📊 Analytics</h1>
+    <div class="grid">
+        <div class="card">
+            <h3>Emotion Distribution</h3>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
 
-<div class="grid">
+        <div class="card">
+            <h3>Total Count</h3>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
 
-<!-- PIE -->
+        <div class="card">
+            <h3>Daily Trend (Last 5 Logs)</h3>
+            <div class="chart-container">
+                <canvas id="dailyChart"></canvas>
+            </div>
+        </div>
 
-<div class="card">
-<h3>Emotion Distribution</h3>
-<canvas id="pieChart"></canvas>
-</div>
-
-<!-- BAR -->
-
-<div class="card">
-<h3>Total Count</h3>
-<canvas id="barChart"></canvas>
-</div>
-
-<!-- DAILY -->
-
-<div class="card">
-<h3>Daily Trend</h3>
-<canvas id="dailyChart"></canvas>
-</div>
-
-<!-- WEEKLY -->
-
-<div class="card">
-<h3>Weekly Trend</h3>
-<canvas id="weeklyChart"></canvas>
-</div>
-
-</div>
-
+        <div class="card">
+            <h3>Weekly Progress</h3>
+            <div class="chart-container">
+                <canvas id="weeklyChart"></canvas>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
+    // Colorful options for charts
+    const chartColors = ['#38bdf8', '#f472b6', '#fbbf24', '#4ade80', '#a78bfa'];
 
-async function loadCharts(){
+    async function loadCharts() {
+        try {
+            const res = await fetch('/analytics_data');
+            const data = await res.json();
 
-const res = await fetch('/analytics_data');
-const data = await res.json();
+            const labels = data.labels || [];
+            const values = data.values || [];
 
-const labels = data.labels;
-const values = data.values;
+            if (labels.length === 0) {
+                console.log("No data found for charts");
+            }
 
-/* PIE */
-new Chart(document.getElementById("pieChart"),{
-type:'pie',
-data:{
-labels:labels,
-datasets:[{data:values}]
-}
-});
+            /* 1. PIE CHART */
+            new Chart(document.getElementById("pieChart"), {
+                type: 'doughnut', // Pie se thoda modern dikhta hai
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: chartColors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
+                }
+            });
 
-/* BAR */
-new Chart(document.getElementById("barChart"),{
-type:'bar',
-data:{
-labels:labels,
-datasets:[{data:values}]
-}
-});
+            /* 2. BAR CHART */
+            new Chart(document.getElementById("barChart"), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Frequency',
+                        data: values,
+                        backgroundColor: '#38bdf8',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
 
-/* DAILY (fake trend for now) */
-new Chart(document.getElementById("dailyChart"),{
-type:'line',
-data:{
-labels:["Mon","Tue","Wed","Thu","Fri"],
-datasets:[{
-label:"Mood",
-data:values.slice(0,5)
-}]
-}
-});
+            /* 3. DAILY CHART */
+            new Chart(document.getElementById("dailyChart"), {
+                type: 'line',
+                data: {
+                    labels: ["Log 1", "Log 2", "Log 3", "Log 4", "Log 5"],
+                    datasets: [{
+                        label: "Trend",
+                        data: values.length >= 5 ? values.slice(-5) : values,
+                        borderColor: '#4ade80',
+                        backgroundColor: 'rgba(74, 222, 128, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
 
-/* WEEKLY */
-new Chart(document.getElementById("weeklyChart"),{
-type:'line',
-data:{
-labels:["W1","W2","W3","W4"],
-datasets:[{
-label:"Mood",
-data:values.slice(0,4)
-}]
-}
-});
+            /* 4. WEEKLY CHART */
+            new Chart(document.getElementById("weeklyChart"), {
+                type: 'line',
+                data: {
+                    labels: ["W1", "W2", "W3", "W4"],
+                    datasets: [{
+                        label: "Mood Score",
+                        data: [12, 19, 15, 25], // Hardcoded for now
+                        borderColor: '#a78bfa',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
 
-}
+        } catch (error) {
+            console.error("Error loading charts:", error);
+        }
+    }
 
-loadCharts();
-
+    loadCharts();
 </script>
 
 </body>
 </html>
-
-
-

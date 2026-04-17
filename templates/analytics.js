@@ -39,3 +39,4 @@ function loadCharts() {
 // 🔄 AUTO UPDATE
 setInterval(loadCharts, 2000);
 loadCharts();
+

@@ -999,3 +999,21 @@ body.light .navbar {
     background: linear-gradient(90deg, rgba(230, 200, 255, 0.3), rgba(220, 190, 255, 0.2));
     backdrop-filter: blur(20px);
 }
+
+/* 1. "PERSONA" Title ke liye */
+.sidebar-top h2 {
+    color: white !important;
+    margin-bottom: 20px; /* Thoda gap ke liye (Optional) */
+}
+
+/* 2. "Heavens Equal" text ke liye */
+.profile p, .profile b {
+    color: white !important;
+}
+
+/* 3. Agar tu Light mode ke liye specifically change karna chahta hai */
+body.light .sidebar-top h2,
+body.light .profile p,
+body.light .profile b {
+    color: white !important;
+}

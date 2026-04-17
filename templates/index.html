@@ -1,171 +1,209 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Persona</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<style>
+/* 🔥 BAWAAL POINTS PILL DESIGN 🔥 */
+.points-pill {
+    background: linear-gradient(135deg, #a855f7, #d946ef);
+    padding: 8px 24px;
+    border-radius: 50px;
+    font-size: 28px;
+    font-weight: 900;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 20px rgba(217, 70, 239, 0.4);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+}
 
+/* Pop animation class */
+.points-pill.pop {
+    transform: scale(1.15);
+    box-shadow: 0 12px 25px rgba(217, 70, 239, 0.7);
+}
 
+.star-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 4px 6px rgba(255, 215, 0, 0.6));
+    animation: float 3s ease-in-out infinite;
+}
 
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* 🔥 CRITICAL FIX FOR MIRRORED TEXT 🔥 */
+#cameraStream {
+    transform: none !important; /* Prevents external CSS from flipping the image */
+    -webkit-transform: none !important;
+}
+</style>
 </head>
-
 <body>
 
 <div class="container">
-
-<div class="sidebar">
-  <div class="sidebar-top">
-    <h2>PERSONA</h2>
-
-    <div class="profile">
-      <img src="https://i.pravatar.cc/100">
-      <p><b>Heavens Equal</b></p>
-    </div>
-  </div>
-
-  <div class="sidebar-scroll">
-    <div class="menu">
-      <a href="/profile">👤 Profile</a>
-      <a href="/chat">💬 Chat</a>
-      <a href="/music">🎵 Music</a>
-      <a href="/analytics">📊 Trends</a>
-      <a href="javascript:void(0)" onclick="openGames()">🎮 Games</a>
-      <a href="/">📷 Dashboard</a>
-      <a href="/settings">⚙️ Settings</a>
-
-      <button onclick="toggleTheme()">🌗 Theme</button>
-    </div>
-  </div>
-</div>
-
-<div class="main">
-
-<div class="header">
-<h2>Persona — Because every feeling deserves to be heard 🌿💖</h2>
-<div class="points">⭐ <span id="points">0</span></div>
-</div>
-
-<div class="grid">
-
-<div class="card">
-
-<h3>📷 Live Emotion Detection</h3>
-
-<div class="camera-card">
-  <div class="camera-display">
-    <div class="camera-box" id="cameraBox" style="display:none;">
-      <img id="cameraStream" src="" style="width:100%; opacity: 1 !important; display: block;">
+    <div class="sidebar">
+      <div class="sidebar-top">
+        <h2>PERSONA</h2>
+        <div class="profile">
+          <img src="https://i.pravatar.cc/100">
+          <p><b>Heavens Equal</b></p>
+        </div>
+      </div>
+      <div class="sidebar-scroll">
+        <div class="menu">
+          <a href="/profile">👤 Profile</a>
+          <a href="/chat">💬 Chat</a>
+          <a href="/analytics">📊 Trends</a>
+          <a href="javascript:void(0)" onclick="openGames()">🎮 Games</a>
+          <a href="/">📷 Dashboard</a>
+          <a href="/settings">⚙️ Settings</a>
+          <button onclick="toggleTheme()">🌗 Theme</button>
+        </div>
+      </div>
     </div>
 
-    <div id="previewBox" style="display:none; width:100%;">
-      <img id="preview" src="" style="width:100%; border-radius: 10px; display: block;">
+    <div class="main">
+        <div class="header">
+            <h2>Persona — Because every feeling deserves to be heard 🌿💖</h2>
+            
+            <div class="points-pill" id="pointsBox">
+                <span class="star-icon">🌟</span> 
+                <span id="points">0</span>
+            </div>
+
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>📷 Live Emotion Detection</h3>
+                <div class="camera-card">
+                  <div class="camera-display">
+                    <div class="camera-box" id="cameraBox" style="display:none;">
+                      <img id="cameraStream" src="" style="width:100%; opacity: 1 !important; display: block; transform: none !important;">
+                    </div>
+                    <div id="previewBox" style="display:none; width:100%;">
+                      <img id="preview" src="" style="width:100%; border-radius: 10px; display: block;">
+                    </div>
+                  </div>
+
+                  <div class="button-row">
+                    <button onclick="toggleCamera()" id="cameraBtn">Open Camera</button>
+                    <label class="upload-btn">
+                      Choose File
+                      <input type="file" id="photoInput" hidden accept="image/*">
+                    </label>
+                  </div>
+
+                  <div class="status-text">
+                    EMOTION : <span id="emotionStatus">Pending...</span>
+                  </div>
+
+                  <div id="emotionMusicSection" style="display:none; margin-top: 20px;">
+                    <h4 style="color: #ff79c6; margin-bottom: 12px;">🎵 Music for Your Mood</h4>
+                    <div id="spotifyPlayerDashboard">Loading music...</div>
+                    <div style="margin-top: 15px;">
+                      <h5 style="color: #ffffff; margin: 10px 0; font-size: 14px;">YouTube Songs</h5>
+                      <div id="songListDashboard">Loading songs...</div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            <div class="right-sidebar">
+                <div class="card">
+                    <h3>🧠 Mood Suggestion</h3>
+                    <p id="suggestion">Turn on camera to get mood insights 💖</p>
+                </div>
+                
+                <div class="card">
+                    <h3>🧠 Current Mood</h3>
+                    <div style="font-size:30px; cursor:pointer;">
+                        <span onclick="submitMood('happy')">😄</span>
+                        <span onclick="submitMood('sad')">😢</span>
+                        <span onclick="submitMood('angry')">😡</span>
+                        <span onclick="submitMood('neutral')">😐</span>
+                        <span onclick="submitMood('surprise')">😲</span>
+                    </div>
+                    <p id="moodQuote" style="margin-top:15px;">Click your mood 💭</p>
+                </div>
+
+                <div class="card">
+                    <h3> Smart Growth Tasks</h3>
+                    <p id="taskText">Turn on camera to get tasks 💡</p>
+                    <button onclick="completeTask()">Complete Task ✅</button>
+                </div>
+
+                <div class="card">
+                    <h3>🔥 Stats</h3>
+                    <p>Streak: <span id="streak">0</span></p>
+                </div>
+            </div>
+        </div> <div class="card" style="margin-top: 20px; border-left: 4px solid #6366f1;">
+            <h3 style="color: #6366f1;">💙 Professional Support</h3>
+            <p style="font-size: 14px; color: #aaa;">Sometimes, we all need a little extra help. Connect with certified therapists and psychologists.</p>
+            <button onclick="findTherapist()" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); margin-top: 10px;">
+                Find a Therapist 🌿
+            </button>
+        </div>
+
+        <div class="card" id="sponsorSection" style="margin-top: 20px; text-align: center; border: 2px dashed rgba(255, 121, 198, 0.4); background: rgba(255, 255, 255, 0.02); transition: all 0.3s ease;">
+            <h4 style="color: #ff79c6; margin-bottom: 10px; font-size: 16px; letter-spacing: 1px;">🌟 MINDFUL PARTNERS JOINING SOON</h4>
+            <p style="color: #aaa; font-size: 13px; line-height: 1.6; margin: 0;">
+                We are currently handpicking premium wellness & lifestyle brands who truly care about your emotional well-being.<br>
+                <span style="color: #fff; font-weight: bold;">Big things are coming! 🚀</span>
+            </p>
+        </div>
+        
+        <div id="gamesModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:65%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center;">
+            <div style="background:#111; padding:30px; border-radius:20px; text-align:center; width:300px;">
+                <h2>🎮 Mini Games</h2>
+                <button onclick="comingSoon()">📔 Journal Writing</button>
+                <button onclick="comingSoon()">🧠 Mood Puzzle</button>
+                <br><br>
+                <button onclick="closeGames()">❌ Close</button>
+            </div>
+        </div>
     </div>
-  </div>
-
-  <div class="button-row">
-    <button onclick="toggleCamera()" id="cameraBtn">Open Camera</button>
-    <label class="upload-btn">
-      Choose File
-      <input type="file" id="photoInput" hidden accept="image/*">
-    </label>
-  </div>
-
-  <div class="status-text">
-    EMOTION : <span id="emotionStatus">Pending...</span>
-  </div>
-
-  <div id="emotionMusicSection" style="display:block; margin-top: 20px;">
-    <h4 style="color: #ff79c6; margin-bottom: 12px;">🎵 Music for Your Mood</h4>
-    <div id="spotifyPlayerDashboard">Loading music...</div>
-    <div style="margin-top: 15px;">
-      <h5 style="color: #ffffff; margin: 10px 0; font-size: 14px;">YouTube Songs</h5>
-      <div id="songListDashboard">Loading songs...</div>
-    </div>
-  </div>
 </div>
-
-</div>
-
-<div class="right-sidebar">
-
-<div class="card">
-<h3>🧠 Mood Suggestion</h3>
-<p id="suggestion">Turn on camera to get mood insights 💖</p>
-</div>
-<div class="card">
-<h3>🧠 Current Mood</h3>
-
-<div style="font-size:30px; cursor:pointer;">
-<span onclick="submitMood('happy')">😄</span>
-<span onclick="submitMood('sad')">😢</span>
-<span onclick="submitMood('angry')">😡</span>
-<span onclick="submitMood('neutral')">😐</span>
-<span onclick="submitMood('surprise')">😲</span>
-</div>
-
-<p id="moodQuote" style="margin-top:15px;">
-Click your mood 💭
-</p>
-</div>
-
-<div class="card">
-<h3> Smart Growth Tasks</h3>
-
-<p id="taskText">Turn on camera to get tasks 💡</p>
-
-<button onclick="completeTask()">Complete Task ✅</button>
-</div>
-
-<div class="card">
-<h3>🔥 Stats</h3>
-<p>Streak: <span id="streak">0</span></p>
-</div>
-<div id="gamesModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center;">
-
-    <div style="background:#111; padding:30px; border-radius:20px; text-align:center; width:300px;">
-
-        <h2>🎮 Mini Games</h2>
-
-        <button onclick="comingSoon()">📔 Journal Writing</button>
-        <button onclick="comingSoon()">🧠 Mood Puzzle</button>
-
-        <br><br>
-        <button onclick="closeGames()">❌ Close</button>
-
-    </div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- 🔥 ONLY SCRIPT PART REPLACE KAR -->
 
 <script>
+let cameraStarted = false;
 
-// 🔍 DEBUG: Check if music section element exists
-console.log("Page loaded - checking elements...");
-window.addEventListener('DOMContentLoaded', () => {
-    const musicSection = document.getElementById("emotionMusicSection");
-    const spotifyDiv = document.getElementById("spotifyPlayerDashboard");
-    const songsDiv = document.getElementById("songListDashboard");
-    
-    console.log("🎵 Music section element:", musicSection ? "✅ Found" : "❌ NOT FOUND");
-    console.log("🎵 Spotify div:", spotifyDiv ? "✅ Found" : "❌ NOT FOUND");
-    console.log("🎵 Songs div:", songsDiv ? "✅ Found" : "❌ NOT FOUND");
-    
-    if (musicSection) {
-        console.log("Current display style:", window.getComputedStyle(musicSection).display);
+// 🔥 REAL-TIME ROLLING NUMBER ANIMATION 🔥
+function animatePoints(id, start, end, duration) {
+    if (start === end) return;
+    let obj = document.getElementById(id);
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerText = Math.floor(progress * (end - start) + start);
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        } else {
+            obj.innerText = end;
+        }
+    };
+    window.requestAnimationFrame(step);
+}
+
+// Function to handle points update UI
+function updatePointsUI(newPoints) {
+    let currentPoints = parseInt(document.getElementById("points").innerText) || 0;
+    if(newPoints !== currentPoints) {
+        animatePoints("points", currentPoints, newPoints, 1000); 
+        let pointsBox = document.getElementById("pointsBox");
+        pointsBox.classList.add("pop");
+        setTimeout(() => { pointsBox.classList.remove("pop"); }, 300);
     }
-});
-
-let cameraStarted=false;
+}
 
 // ✅ CAMERA
 function toggleCamera() {
@@ -175,10 +213,8 @@ function toggleCamera() {
 
     if (cam.style.display === "none" || cam.style.display === "") {
         cam.style.display = "block";
-        // 🔥 Ye line add kar class trigger karne ke liye
         setTimeout(() => cam.classList.add("active"), 10); 
-        
-        stream.src = "/video?" + new Date().getTime();
+        stream.src = "/video?" + new Date().getTime(); // Refresh logic to stop browser caching
         btn.innerText = "Close Camera";
         cameraStarted = true;
         fetch('/set_camera_status', {
@@ -187,12 +223,11 @@ function toggleCamera() {
             body: JSON.stringify({ active: true })
         });
     } else {
-        cam.classList.remove("active"); // 🔥 Class hatao
+        cam.classList.remove("active");
         cam.style.display = "none";
         stream.src = "";
         btn.innerText = "Open Camera";
         cameraStarted = false;
-        // Hide music when camera closes
         document.getElementById("emotionMusicSection").style.display = "none";
         lastDisplayedEmotion = "";
         fetch('/set_camera_status', {
@@ -203,75 +238,52 @@ function toggleCamera() {
     }
 }
 
-// ✅ UPLOAD (FIXED)
-document.getElementById("photoInput").addEventListener("change",function(e){
-
-let file = e.target.files[0];
+// ✅ UPLOAD
+document.getElementById("photoInput").addEventListener("change", function(e){
+    let file = e.target.files[0];
     let preview = document.getElementById("preview");
     let previewBox = document.getElementById("previewBox");
     let cameraBox = document.getElementById("cameraBox");
 
     if(file){
-        // Camera hide karo aur preview dikhao
         cameraBox.style.display = "none";
         previewBox.style.display = "block";
-        
         preview.src = URL.createObjectURL(file);
-        
-        // Show music suggestion for upload
         displayUploadMusic();
     }
 });
 
-// ✅ THEME
-function toggleTheme(){
-document.body.classList.toggle("light");
-}
+// ✅ THEME & GAMES
+function toggleTheme(){ document.body.classList.toggle("light"); }
+function openGames(){ document.getElementById("gamesModal").style.display="flex"; }
+function closeGames(){ document.getElementById("gamesModal").style.display="none"; }
+function comingSoon(){ alert("🚀 Coming Soon!\n\nWe are building something insane 😈🔥"); }
 
-// ✅ GAMES
-function openGames(){
-document.getElementById("gamesModal").style.display="flex";
-}
-
-function closeGames(){
-document.getElementById("gamesModal").style.display="none";
-}
-
-function comingSoon(){
-alert("🚀 Coming Soon!\n\nWe are building something insane 😈🔥");
+// ✅ NEW FEATURE: Therapist Alert
+function findTherapist() {
+    alert(
+        "🌿 Healing is a journey, and you won't walk it alone.\n\n" +
+        "Real strength is asking for help. We are currently handpicking the best, most empathetic therapists and psychologists for you.\n\n" +
+        "✨ A safe space is coming very soon... Hang in there, you matter! 💙"
+    );
 }
 
 // ✅ MOOD FEATURE
 const moodQuotes = {
-happy:[
-"Keep shining, your vibe is powerful ✨",
-"Success loves positive energy 💪"
-],
-sad:[
-"Tough times don’t last, strong people do 💙",
-"You are stronger than you think 🧠"
-],
-angry:[
-"Control your anger or it will control you 🔥",
-"Pause. Breathe. Think. Then act 😌"
-],
-neutral:[
-"Consistency beats motivation ⚡",
-"Stay focused, you’re building something big 🚀"
-],
-surprise:[
-"Life is full of unexpected magic 😲",
-"Embrace the moment, it’s your story 🌟"
-]
+    happy:["Keep shining, your vibe is powerful ✨", "Success loves positive energy 💪"],
+    sad:["Tough times don’t last, strong people do 💙", "You are stronger than you think 🧠"],
+    angry:["Control your anger or it will control you 🔥", "Pause. Breathe. Think. Then act 😌"],
+    neutral:["Consistency beats motivation ⚡", "Stay focused, you’re building something big 🚀"],
+    surprise:["Life is full of unexpected magic 😲", "Embrace the moment, it’s your story 🌟"]
 };
 
 function setMood(mood){
-let quotes = moodQuotes[mood] || moodQuotes.neutral;
-let random = quotes[Math.floor(Math.random() * quotes.length)];
-document.getElementById("moodQuote").innerText = random;
+    let quotes = moodQuotes[mood] || moodQuotes.neutral;
+    let random = quotes[Math.floor(Math.random() * quotes.length)];
+    document.getElementById("moodQuote").innerText = random;
 }
 
-// ✅ MOOD SUBMISSION WITH 24HR COOLDOWN
+// ✅ MOOD SUBMISSION
 let emotionSubmitCooldown = 0;
 let emotionSubmitInterval = null;
 let MANUAL_EMOTION_COOLDOWN = 86400;
@@ -307,13 +319,9 @@ function checkCooldown() {
     fetch('/emotion_cooldown')
         .then(res => res.json())
         .then(data => {
-            // Calculate remaining time based on server time, not browser time
             emotionSubmitCooldown = data.time_remaining;
-            
-            // If there's remaining cooldown, start the countdown
             if (emotionSubmitCooldown > 0) {
                 updateCooldownDisplay();
-                
                 if (emotionSubmitInterval) clearInterval(emotionSubmitInterval);
                 emotionSubmitInterval = setInterval(() => {
                     emotionSubmitCooldown--;
@@ -340,8 +348,6 @@ function submitMood(mood) {
         if (data.status === "ok") {
             emotionSubmitCooldown = MANUAL_EMOTION_COOLDOWN;
             updateCooldownDisplay();
-            
-            // Start 24-hr countdown
             if (emotionSubmitInterval) clearInterval(emotionSubmitInterval);
             emotionSubmitInterval = setInterval(() => {
                 emotionSubmitCooldown--;
@@ -353,223 +359,152 @@ function submitMood(mood) {
     });
 }
 
-// Check cooldown on page load
 checkCooldown();
 
 function updateSuggestion(text){
-if(text){
- document.getElementById("suggestion").innerText = text;
- return;
-}
- document.getElementById("suggestion").innerText = "Turn on camera to get mood insights 💖";
+    if(text){
+     document.getElementById("suggestion").innerText = text;
+     return;
+    }
+    document.getElementById("suggestion").innerText = "Turn on camera to get mood insights 💖";
 }
 
 const tasks = {
-happy: [
-"Talk to 1 new person today and start a conversation 🤝",
-"Give a genuine compliment to someone 😊"
-],
-
-sad: [
-"Call a friend and share how you feel 💙",
-"Go outside and walk for 10 minutes 🌿"
-],
-
-angry: [
-"Pause and take 10 deep breaths 🧘",
-"Write down what made you angry and reflect ✍️"
-],
-
-neutral: [
-"Start a conversation with someone around you 💬",
-"Learn something new for 15 minutes 📚"
-],
-
-surprise: [
-"Try something new outside your comfort zone 🚀",
-"Speak up in a group discussion today 💥"
-]
+    happy: ["Talk to 1 new person today and start a conversation 🤝", "Give a genuine compliment to someone 😊"],
+    sad: ["Call a friend and share how you feel 💙", "Go outside and walk for 10 minutes 🌿"],
+    angry: ["Pause and take 10 deep breaths 🧘", "Write down what made you angry and reflect ✍️"],
+    neutral: ["Start a conversation with someone around you 💬", "Learn something new for 15 minutes 📚"],
+    surprise: ["Try something new outside your comfort zone 🚀", "Speak up in a group discussion today 💥"]
 };
 
 let currentTask = "";
 let lastTaskEmotion = "";
-let lastDisplayedEmotion = ""; // Track emotion to prevent flickering
+let lastDisplayedEmotion = ""; 
 
-// 🎵 Music data for emotions
+// 🎵 Unified Music data for emotions
 const emotionMusic = {
     happy: {
-        spotify: "https://open.spotify.com/embed/track/0VjIjW4GlUZAMYd2vXMi3b",
-        youtube: [
-            {name: "Shape of You", link: "https://youtu.be/JGwWNGJdvx8"},
-            {name: "Walking on Sunshine", link: "https://youtu.be/iPUmE-tne5U"}
-        ]
+        spotify: "https://open.spotify.com/embed/track/6UelLqGlWMcVH1E5c4H7lY?utm_source=generator",
+        youtube: [ {name: "Fikar Not", link: "https://www.youtube.com/watch?v=mxva6l4bCSI"} ]
     },
     sad: {
-        spotify: "https://open.spotify.com/embed/track/7MXVkk9YMctZqd1Srtv4MB",
+        spotify: "https://open.spotify.com/embed/track/4kbj5MwxO1bq9wjT5g9HaA?utm_source=generator",
         youtube: [
-            {name: "Let Her Go", link: "https://youtu.be/RBumgq5yVrA"},
-            {name: "Someone Like You", link: "https://youtu.be/hHUbLv4ThOo"}
+            {name: "Agar Tum saath ho", link: "https://www.youtube.com/watch?v=sK7riqg2mr4"},
+            {name: "Someone Like You", link: "https://www.youtube.com/watch?v=hLQl3WQQoQ0"}
         ]
     },
     angry: {
-        spotify: "https://open.spotify.com/embed/track/0pqnGHJpmpxLKifKRmU6WP",
+        spotify: "https://open.spotify.com/embed/track/0pqnGHJpmpxLKifKRmU6WP?utm_source=generator",
         youtube: [
-            {name: "Believer", link: "https://youtu.be/7wtfhZwyrcc"},
-            {name: "Everybody Wants to Rule the World", link: "https://youtu.be/aGCdLKXNhjc"}
+            {name: "Believer", link: "https://www.youtube.com/watch?v=o0LydWpBQts"},
+            {name: "Everybody Wants to Rule the World", link: "https://www.youtube.com/watch?v=tSBWmxwT8So"}
         ]
     },
     neutral: {
-        spotify: "https://open.spotify.com/embed/track/6ocbgoVGwYJhOv1GgI9NsF",
+        spotify: "https://open.spotify.com/embed/track/2VxeLyX666F8uXCJ0dZF8B?utm_source=generator",
         youtube: [
-            {name: "Lofi Chill", link: "https://youtu.be/5qap5aO4i9A"},
-            {name: "Focus Music", link: "https://youtu.be/jANMzzzgIow"}
+            {name: "dooron", link: "https://www.youtube.com/watch?v=9T-Zbxg9X_4"},
+            {name: "Finding Her", link: "https://www.youtube.com/watch?v=3Cp2QTBZAFQ"}
         ]
     },
     surprise: {
-        spotify: "https://open.spotify.com/embed/track/1AhDOtG9vPSOmsWgNW0BEY",
+        spotify: "https://open.spotify.com/embed/track/4bHsxqR3GMrXTxEPLuK5ue?utm_source=generator",
         youtube: [
-            {name: "Firework", link: "https://youtu.be/QGJuMBdaqIw"},
-            {name: "Don't Stop Me Now", link: "https://youtu.be/HgzGwKwLmgM"}
+            {name: "Firework", link: "https://www.youtube.com/watch?v=KSbwHzlcgs8"},
+            {name: "Don't Stop Me Now", link: "https://www.youtube.com/watch?v=HgzGwKwLmgM"}
         ]
     }
 };
 
 function displayMusicForEmotion(emotion) {
-    console.log("🎵 Displaying music for emotion:", emotion);
-    
     const musicSection = document.getElementById("emotionMusicSection");
-    if (!musicSection) {
-        console.error("Music section element not found!");
-        return;
-    }
+    if (!musicSection) return;
     
-    // All emotions that can show music
     const validEmotions = ['happy', 'sad', 'angry', 'surprise', 'neutral'];
-    
-    // If emotion is not valid, just hide and return
     if (!validEmotions.includes(emotion)) {
-        console.log("Emotion not in valid list, hiding music");
         musicSection.style.display = "none";
         return;
     }
     
-    // Only update if emotion actually changed (prevent flickering)
     if (emotion === lastDisplayedEmotion && musicSection.style.display === "block") {
-        console.log("Same emotion already showing, skipping update");
         return;
     }
     
-    console.log("Updating music for emotion:", emotion);
     lastDisplayedEmotion = emotion;
     const musicData = emotionMusic[emotion];
     
-    if (!musicData) {
-        console.error("No music data for emotion:", emotion);
-        return;
-    }
+    if (!musicData) return;
     
-    // Update Spotify player
     const spotifyDiv = document.getElementById("spotifyPlayerDashboard");
     const songsDiv = document.getElementById("songListDashboard");
     
-    if (!spotifyDiv || !songsDiv) {
-        console.error("Music container divs not found!");
-        return;
-    }
+    spotifyDiv.innerHTML = `<iframe src="${musicData.spotify}" width="100%" height="152" frameborder="0" allowtransparency="true" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
     
-    spotifyDiv.innerHTML = 
-        `<iframe src="${musicData.spotify}" width="100%" height="120" frameborder="0" allowtransparency="true" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
-    
-    // Update YouTube songs list
     let songHtml = "";
     musicData.youtube.forEach(song => {
         songHtml += `<p class="song" onclick="window.open('${song.link}')" style="color: #ff79c6; cursor: pointer; margin: 5px 0;">▶ ${song.name}</p>`;
     });
     songsDiv.innerHTML = songHtml;
     
-    // Show the music section
     musicSection.style.display = "block";
     musicSection.style.visibility = "visible";
-    console.log("✅ Music section displayed for:", emotion);
-    console.log("Display style:", musicSection.style.display);
-    console.log("Visibility style:", musicSection.style.visibility);
 }
 
 function displayUploadMusic() {
-    // Show random music when photo uploaded
     const emotions = ['happy', 'sad', 'angry', 'surprise'];
     const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-    console.log("📤 Upload music triggered with emotion:", randomEmotion);
-    lastDisplayedEmotion = ""; // Reset to force update
+    lastDisplayedEmotion = ""; 
     displayMusicForEmotion(randomEmotion);
 }
 
-// 🔧 TEST FUNCTION - Call this from browser console to test music display
-function testMusicDisplay(emotion = 'happy') {
-    console.log("🧪 Testing music display with emotion:", emotion);
-    lastDisplayedEmotion = ""; // Reset
-    displayMusicForEmotion(emotion);
-}
-
+// Background Task Runner
 setInterval(async ()=>{
-try{
-let res = await fetch('/get_data');
-let data = await res.json();
+    try {
+        let res = await fetch('/get_data');
+        let data = await res.json();
 
-console.log("📊 Full data from /get_data:", data);
-console.log("📋 Emotions array:", data.emotions);
-console.log("📋 Emotions length:", data.emotions ? data.emotions.length : 0);
+        if (cameraStarted) {
+            let emo = data.emotions[data.emotions.length-1] || "neutral";
+            document.getElementById("emotionStatus").innerText = emo.toUpperCase();
+            displayMusicForEmotion(emo);
+            setMood(emo);
+            updateSuggestion(data.suggestion || "");
 
-let emo = data.emotions[data.emotions.length-1] || "neutral";
+            if(emo !== lastTaskEmotion) {
+              let t = tasks[emo] || tasks.neutral;
+              currentTask = t[Math.floor(Math.random()*t.length)];
+              document.getElementById("taskText").innerText = currentTask;
+              lastTaskEmotion = emo;
+            }
+        }
 
-console.log("🎭 Last emotion detected:", emo);
+        // 🔥 ANIMATED POINTS UPDATE 🔥
+        if(data.points !== undefined) {
+            updatePointsUI(data.points);
+        }
 
-// Update emotion status
-document.getElementById("emotionStatus").innerText = emo.toUpperCase();
+        if(document.getElementById("streak")){
+          document.getElementById("streak").innerText = data.streak;
+        }
 
-// Display music for detected emotion
-displayMusicForEmotion(emo);
+    } catch(e) {
+        console.error(e);
+    }
+}, 4000);
 
-// Update mood quote from detected emotion
-setMood(emo);
-
-// Update the camera suggestion text when detection is active
-updateSuggestion(data.suggestion || "");
-
-// Only change task when emotion changes (not every 4 seconds)
-if(emo !== lastTaskEmotion) {
-  let t = tasks[emo] || tasks.neutral;
-  currentTask = t[Math.floor(Math.random()*t.length)];
-  document.getElementById("taskText").innerText = currentTask;
-  lastTaskEmotion = emo;
-}
-
-// Update points and streak in real-time
-document.getElementById("points").innerText = data.points;
-if(document.getElementById("streak")){
-  document.getElementById("streak").innerText = data.streak;
-}
-
-}catch(e){
- console.error(e);
-}
-},4000);
 function completeTask(){
-
-if(!currentTask) return;
-
-fetch('/add_points', { method: 'POST' })
- .then(res => res.json())
- .then(data => {
-     if(data.points !== undefined){
-         document.getElementById("points").innerText = data.points;
-     }
- });
-
-alert("🔥 Task Completed!\n+10 Points");
-
+    if(!currentTask) return;
+    fetch('/add_points', { method: 'POST' })
+     .then(res => res.json())
+     .then(data => {
+         if(data.points !== undefined){
+             // 🔥 ANIMATED POINTS UPDATE 🔥
+             updatePointsUI(data.points);
+         }
+     });
+    alert("🔥 Task Completed!\n+10 Points");
 }
-
 </script>
 </body>
 </html>

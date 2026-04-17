@@ -10,7 +10,7 @@ app = Flask(__name__)
 blockchain = Blockchain()
 
 # 🔥 API KEY (Security Note: Hackathon ke baad isse environment variable mein daal dena)
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "YOUR_KEY"
 
 # 🔥 CAMERA SETUP - Retry Logic ke saath
 # 🔥 CAMERA SETUP - BULLETPROOF VERSION
